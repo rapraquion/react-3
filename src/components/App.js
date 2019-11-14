@@ -20,6 +20,7 @@ class App extends Component {
     this.updatePost = this.updatePost.bind(this);
     this.deletePost = this.deletePost.bind(this);
     this.createPost = this.createPost.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
   }
 
   componentDidMount() {
@@ -35,7 +36,7 @@ class App extends Component {
 
   updatePost(id, text) {
     axios
-      .put(`http://localhost:9090/posts/${id}`, { text })
+      .patch(`http://localhost:9090/posts/${id}`, { text })
       .then(response => {
         this.setState({
           post: response.data
@@ -44,26 +45,61 @@ class App extends Component {
       .catch(err => console.log(err))
   }
 
-  deletePost() { }
+  deletePost(id) {
+    axios
+      .delete(`http://localhost:9090/posts/${id}`)
+      .then(response => {
+        this.setState({
+          post: this.state.posts.filter(post => post.id !== id)
+        });
+      })
+      .catch(err => console.log(err))
+  }
 
-  createPost() { }
+  createPost(text) {
+    axios
+      .post(`http://localhost:9090/posts`, { text })
+      .then(results => {
+        console.log(results.data);
+        this.setState({
+          posts: results.data
+        })
+      })
+      .catch(err => console.log(err))
+  }
+
+  handleSearch(e) {
+    axios
+      .get(`http://localhost:9090/posts`)
+      .then(res => {
+        var val = res.data.filter(item => {
+          return item.text.match(e)
+        })
+        this.setState({
+          posts: val
+        })
+      })
+      .catch(err => console.log(err))
+  }
 
   render() {
     const { posts } = this.state;
 
     return (
       <div className="App__parent">
-        <Header />
+        <Header searchText={this.handleSearch} />
 
         <section className="App__content">
-          <Compose />
+          <Compose
+            createPostFn={this.createPost} />
           {posts.map(post => (
             <Post
               key={post.id}
               id={post.id}
               text={post.text}
               date={post.date}
-              updatePostFn={this.updatePost} />
+              updatePostFn={this.updatePost}
+              deletePostFn={this.deletePost} />
           ))}
         </section>
       </div>
