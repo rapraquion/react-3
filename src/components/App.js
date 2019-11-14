@@ -28,7 +28,7 @@ class App extends Component {
       .get('http://localhost:9090/posts')
       .then(response => {
         this.setState({
-          posts: [...response.data]
+          posts: response.data
         })
       })
       .catch(err => console.log(err))
@@ -36,11 +36,17 @@ class App extends Component {
 
   updatePost(id, text) {
     axios
-      .patch(`http://localhost:9090/posts/${id}`, { text })
+      .put(`http://localhost:9090/posts/${id}`, { text })
       .then(response => {
-        this.setState({
-          post: response.data
-        })
+        const updatedPost = response.data;
+        const updatedPosts = this.state.posts.map(post => {
+          if (post.id === updatedPost.id) {
+            return { post, ...updatedPost };
+          } else {
+            return post;
+          }
+        });
+        this.setState({ posts: updatedPosts });
       })
       .catch(err => console.log(err))
   }
@@ -60,24 +66,23 @@ class App extends Component {
     axios
       .post(`http://localhost:9090/posts`, { text })
       .then(results => {
-        console.log(results.data);
-        this.setState({
-          posts: results.data
-        })
+        this.setState({ posts: results.data })
       })
       .catch(err => console.log(err))
   }
 
-  handleSearch(e) {
+  handleSearch(text) {
+    let texts = text.target.value;
+    let res = [];
+
     axios
       .get(`http://localhost:9090/posts`)
-      .then(res => {
-        var val = res.data.filter(item => {
-          return item.text.match(e)
+      .then(datas => {
+        datas.data.map(data => {
+          if (data.text.includes(`${texts}`))
+            return res.push(data)
         })
-        this.setState({
-          posts: val
-        })
+        this.setState({ posts: res });
       })
       .catch(err => console.log(err))
   }
