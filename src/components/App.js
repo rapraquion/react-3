@@ -25,7 +25,7 @@ class App extends Component {
 
   componentDidMount() {
     axios
-      .get('http://localhost:9090/posts')
+      .get('https://practiceapi.devmountain.com/api/posts')
       .then(response => {
         this.setState({
           posts: response.data
@@ -36,7 +36,7 @@ class App extends Component {
 
   updatePost(id, text) {
     axios
-      .put(`http://localhost:9090/posts/${id}`, { text })
+      .put(`https://practiceapi.devmountain.com/api/posts?id=${id}`, { text })
       .then(response => {
         const updatedPost = response.data;
         const updatedPosts = this.state.posts.map(post => {
@@ -53,7 +53,7 @@ class App extends Component {
 
   deletePost(id) {
     axios
-      .delete(`http://localhost:9090/posts/${id}`)
+      .delete(`https://practiceapi.devmountain.com/api/posts?id=${id}`)
       .then(response => {
         this.setState({
           post: this.state.posts.filter(post => post.id !== id)
@@ -64,7 +64,7 @@ class App extends Component {
 
   createPost(text) {
     axios
-      .post(`http://localhost:9090/posts`, { text })
+      .post(`https://practiceapi.devmountain.com/api/posts`, { text })
       .then(results => {
         this.setState({ posts: results.data })
       })
@@ -76,7 +76,7 @@ class App extends Component {
     let res = [];
 
     axios
-      .get(`http://localhost:9090/posts`)
+      .get(`https://practiceapi.devmountain.com/api/posts`)
       .then(datas => {
         datas.data.map(data => {
           if (data.text.includes(`${texts}`))
